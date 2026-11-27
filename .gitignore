@@ -1,0 +1,9 @@
+/.npm-cache/
+/web/node_modules/
+/web/.angular/
+/web/dist/
+/api/bin/
+/api/obj/
+.env
+appsettings.Local.json
+/Documentos que me entregaron/

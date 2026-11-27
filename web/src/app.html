@@ -1,0 +1,96 @@
+<main>
+  <header><span class="brand">SANDE</span><h1>Unificación de productos</h1></header>
+  <mat-card appearance="outlined">
+    <mat-card-content>
+      <form (ngSubmit)="search()">
+        <mat-form-field appearance="outline">
+          <mat-label>Marca</mat-label>
+          <input matInput name="brand" [(ngModel)]="brandText" (ngModelChange)="findBrands($event)"
+                 (focus)="findBrands(brandText)" [matAutocomplete]="brandAuto" [disabled]="busy">
+          <mat-autocomplete #brandAuto="matAutocomplete">
+            @for (brand of brands; track brand.idMarca) { <mat-option [value]="brand.marca">{{ brand.marca }}</mat-option> }
+          </mat-autocomplete>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Proveedor de origen</mat-label>
+          <input matInput name="supplier" [ngModel]="supplierText" (ngModelChange)="editSupplier($event)"
+                 (focus)="findSuppliers(supplierText)" [matAutocomplete]="supplierAuto" [disabled]="busy">
+          <mat-autocomplete #supplierAuto="matAutocomplete" [displayWith]="supplierLabel" (optionSelected)="pickSupplier($event.option.value)">
+            @for (option of suppliers; track option.idEntidad) {
+              <mat-option [value]="option">
+                {{ option.abreviacion }} · {{ option.razonSocial }}
+              </mat-option>
+            }
+          </mat-autocomplete>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="minimum">
+          <mat-label>Mín. clientes</mat-label>
+          <input matInput type="number" min="0" step="1" name="minimum" [(ngModel)]="minClients" [disabled]="busy">
+        </mat-form-field>
+        <div class="filters"><span>Tipo</span>
+          <mat-button-toggle-group multiple aria-label="Tipo de producto" name="types" [(ngModel)]="selectedTypes" [disabled]="busy">
+            @for (type of types; track type) { <mat-button-toggle [value]="type">{{ type }}</mat-button-toggle> }
+          </mat-button-toggle-group>
+        </div>
+        <div class="filters"><span>Situación</span>
+          <mat-button-toggle-group multiple aria-label="Situación" name="situations" [(ngModel)]="selectedSituations" [disabled]="busy">
+            @for (situation of situations; track situation) { <mat-button-toggle [value]="situation">{{ situation }}</mat-button-toggle> }
+          </mat-button-toggle-group>
+        </div>
+        <div class="actions">
+          <button mat-flat-button type="submit" [disabled]="busy || !supplier">Buscar</button>
+          <button mat-stroked-button type="button" (click)="save()" [disabled]="busy || !assigned || invalidDrafts">Guardar ({{ assigned }})</button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  @if (busy) { <mat-progress-bar mode="indeterminate" aria-label="Procesando"></mat-progress-bar> }
+  @if (error) { <p role="alert" class="error">{{ error }}</p> }
+  @if (notice) { <p role="status">{{ notice }}</p> }
+  @if (invalidDrafts) { <p role="status">Seleccione un código de la lista para cada fila editada.</p> }
+  <mat-card appearance="outlined" class="results">
+    @if (!searched) {
+      <p class="empty">Seleccione un proveedor y presione Buscar.</p>
+    } @else {
+      <div class="table-scroll">
+        <table mat-table [dataSource]="rows" aria-label="Productos del proveedor">
+          @for (column of columns; track column.key) {
+            <ng-container [matColumnDef]="column.key">
+              <th mat-header-cell *matHeaderCellDef>
+                @if (column.key === 'codigo') { <strong class="count">{{ total }}</strong> }
+                {{ column.label }}
+              </th>
+              <td mat-cell *matCellDef="let row" [class.code]="column.key === 'codigo'">{{ row[column.key] }}</td>
+            </ng-container>
+          }
+          <ng-container matColumnDef="codigoN">
+            <th mat-header-cell *matHeaderCellDef>Código N</th>
+            <td mat-cell *matCellDef="let row">
+              <mat-form-field appearance="outline" subscriptSizing="dynamic" class="destination-input">
+                <input matInput [attr.aria-label]="'Código destino para ' + row.codigo" [ngModel]="row.draft || ''"
+                       (ngModelChange)="editCode(row, $event)" (focus)="!row.destination && editCode(row, row.draft || '')"
+                       [matAutocomplete]="principalAuto" [disabled]="busy">
+                <mat-autocomplete #principalAuto="matAutocomplete" [displayWith]="principalLabel" (optionSelected)="pickCode(row, $event.option.value)">
+                  @for (option of row.options || []; track $index) {
+                    <mat-option [value]="option">
+                      {{ option.codigo }} · {{ option.proveedor }} · {{ option.producto }}
+                    </mat-option>
+                  }
+                </mat-autocomplete>
+              </mat-form-field>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="destination">
+            <th mat-header-cell *matHeaderCellDef>Destino validado</th>
+            <td mat-cell *matCellDef="let row">{{ row.destination?.proveedor }}<br>{{ row.destination?.producto }}</td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="displayed"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayed"></tr>
+          <tr *matNoDataRow><td [attr.colspan]="displayed.length" class="empty">No se encontraron productos.</td></tr>
+        </table>
+      </div>
+    }
+  </mat-card>
+</main>
+

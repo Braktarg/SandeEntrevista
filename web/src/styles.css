@@ -1,0 +1,18 @@
+body { margin: 0; background: #f5f7fa; color: #162338; font: 14px Roboto, Arial, sans-serif; }
+main { max-width: 1680px; margin: auto; padding: 28px clamp(16px, 4vw, 64px); }
+header { display: flex; align-items: center; gap: 18px; margin-bottom: 24px; flex-wrap: wrap; }
+.brand { background: #15365f; color: white; padding: 9px 12px; border-radius: 6px; font-weight: 700; letter-spacing: .12em; }
+h1 { margin: 0; font-size: clamp(23px, 3vw, 34px); }
+form { display: flex; align-items: flex-start; gap: 12px; flex-wrap: wrap; padding-top: 12px; }
+.minimum { width: 130px; }
+.filters { display: grid; gap: 3px; }
+.filters > span { font-size: 12px; }
+.actions { display: flex; gap: 8px; align-items: center; min-height: 56px; flex-wrap: wrap; }
+.results, mat-progress-bar { margin-top: 18px; }
+.table-scroll { overflow: auto; }
+td.mat-mdc-cell, th.mat-mdc-header-cell { padding: 8px 10px; }
+.code, .count { color: #0057a7; font-weight: bold; }
+.count { display: block; }
+.destination-input { width: 120px; }
+.empty { padding: 24px; }
+.error { color: #a21a22; }
